@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CONSUMER
+  DESIGNER
+  VENUE_OWNER
+  ADMIN
+}
+
+model User {
+  id        String   @id // Clerk User ID
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  imageUrl  String?
+  role      UserRole @default(CONSUMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  spaces      Space[]
+  collections Collection[]
+  reviews     Review[]
+}
+
+model Space {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String
+  location    String?
+  type        String?  // e.g., "Residential", "Commercial", "Hospitality"
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+  reviews  Review[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  currency    String   @default("USD")
+  imageUrl    String
+  buyLink     String?
+  spaceId     String
+  space       Space    @relation(fields: [spaceId], references: [id])
+  
+  // Coordinates for visual search/tagging (0-100%)
+  xPosition   Float?
+  yPosition   Float?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Collection {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  spaceId   String
+  space     Space    @relation(fields: [spaceId], references: [id])
+  createdAt DateTime @default(now())
+}
