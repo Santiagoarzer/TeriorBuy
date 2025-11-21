@@ -50,6 +50,9 @@ export function Navbar() {
                 {/* Actions */}
                 <div className="flex items-center gap-2">
                     <SignedIn>
+                        <Button variant="ghost" size="sm" asChild className="hidden md:flex mr-2">
+                            <Link href="/upload">Upload Space</Link>
+                        </Button>
                         <Button variant="ghost" size="icon" className="hidden md:flex">
                             <ShoppingBag className="h-5 w-5" />
                             <span className="sr-only">Cart</span>
